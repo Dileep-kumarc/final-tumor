@@ -41,8 +41,8 @@ def load_models():
                 x = self.fc2(x)
                 return x
 
-        # Load from GitHub
-        model_url = "https://github.com/yourusername/yourrepo/raw/main/models/best_mri_classifier.pth"
+        # Updated GitHub URL for the custom CNN model
+        model_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/best_mri_classifier.pth"
         model = CustomCNN()
         state_dict = torch.hub.load_state_dict_from_url(model_url, map_location=torch.device('cpu'))
         model.load_state_dict(state_dict)
@@ -58,10 +58,10 @@ def load_models():
 
     custom_cnn_model = load_custom_model()
     
-    # Update these URLs with your actual GitHub raw URLs
-    classifier_url = "https://github.com/yourusername/yourrepo/raw/main/models/brain_tumor_classifier.h5"
-    segmentation_url = "https://github.com/yourusername/yourrepo/raw/main/models/brain_tumor_segmentation_unet.h5"
-    tumor_size_url = "https://github.com/yourusername/yourrepo/raw/main/models/tumor_size_model.h5"
+    # Updated GitHub URLs for all Keras models
+    classifier_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/brain_tumor_classifier.h5"
+    segmentation_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/brain_tumor_segmentation_unet.h5"
+    tumor_size_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/tumor_size_model.h5"
     
     classifier_model = load_keras_model(classifier_url)
     segmentation_model = load_keras_model(segmentation_url)
@@ -659,7 +659,6 @@ def analysis_page():
 # ======================
 # MAIN APP CONFIG
 # ======================
-
 def main():
     st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="wide")
     with open("style.css") as f:
@@ -688,11 +687,39 @@ def main():
     elif query_params == "Analysis":
         analysis_page()
     elif query_params == "HowItWorks":
-        st.switch_page("pages/2_How_It_Works.py")
+        # Updated GitHub URL for How It Works page
+        how_it_works_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/2_How_It_Works.py"
+        module = load_module_from_github(how_it_works_url)
+        module.show()
     elif query_params == "About":
-        st.switch_page("pages/1_About.py")
+        # Updated GitHub URL for About page
+        about_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/1_About.py"
+        module = load_module_from_github(about_url)
+        module.show()
     elif query_params == "Contact":
-        st.switch_page("pages/3_Contact.py")
+        # Updated GitHub URL for Contact page
+        contact_url = "https://github.com/Dileep-kumarc/final-tumor/raw/main/3_Contact.py"
+        module = load_module_from_github(contact_url)
+        module.show()
 
-if __name__ == "__main__":
-    main()
+def load_module_from_github(url):
+    import urllib.request
+    import importlib.util
+    import tempfile
+    import os
+    
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".py", delete=False) as tmp:
+        tmp_path = tmp.name
+        urllib.request.urlretrieve(url, tmp_path)
+    
+    # Load the module
+    module_name = os.path.basename(tmp_path).replace('.py', '')
+    spec = importlib.util.spec_from_file_location(module_name, tmp_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    
+    # Clean up
+    os.unlink(tmp_path)
+    
+    return module
