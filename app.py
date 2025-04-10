@@ -18,7 +18,6 @@ import plotly.express as px
 # ======================
 # MODEL DEFINITIONS
 # ======================
-
 @st.cache_resource
 def load_models():
     """Load all ML models with caching"""
@@ -42,15 +41,32 @@ def load_models():
                 x = self.fc2(x)
                 return x
 
+        # Load from GitHub
+        model_url = "https://github.com/yourusername/yourrepo/raw/main/models/best_mri_classifier.pth"
         model = CustomCNN()
-        model.load_state_dict(torch.load(r"C:\main project files\mri and non mri classfier\best_mri_classifier.pth", map_location=torch.device('cpu')))
+        state_dict = torch.hub.load_state_dict_from_url(model_url, map_location=torch.device('cpu'))
+        model.load_state_dict(state_dict)
         model.eval()
         return model
 
+    def load_keras_model(url):
+        import tempfile
+        import urllib.request
+        model_path = tempfile.NamedTemporaryFile(suffix=".h5").name
+        urllib.request.urlretrieve(url, model_path)
+        return tf.keras.models.load_model(model_path)
+
     custom_cnn_model = load_custom_model()
-    classifier_model = tf.keras.models.load_model(r"C:\Users\dilee\Downloads\cnn model traning\brain_tumor_classifier.h5")
-    segmentation_model = tf.keras.models.load_model(r"C:\Users\dilee\Downloads\cnn model traning\brain_tumor_segmentation_unet.h5")
-    tumor_size_model = tf.keras.models.load_model(r"C:\Users\dilee\Downloads\tumor_size_model.h5")
+    
+    # Update these URLs with your actual GitHub raw URLs
+    classifier_url = "https://github.com/yourusername/yourrepo/raw/main/models/brain_tumor_classifier.h5"
+    segmentation_url = "https://github.com/yourusername/yourrepo/raw/main/models/brain_tumor_segmentation_unet.h5"
+    tumor_size_url = "https://github.com/yourusername/yourrepo/raw/main/models/tumor_size_model.h5"
+    
+    classifier_model = load_keras_model(classifier_url)
+    segmentation_model = load_keras_model(segmentation_url)
+    tumor_size_model = load_keras_model(tumor_size_url)
+    
     return custom_cnn_model, classifier_model, segmentation_model, tumor_size_model
 
 # ======================
