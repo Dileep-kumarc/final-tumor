@@ -19,9 +19,12 @@ import plotly.express as px
 # MODEL DEFINITIONS
 # ======================
 
+
+
 @st.cache_resource
 def load_models():
     """Load all ML models with caching"""
+
     def load_custom_model():
         class CustomCNN(nn.Module):
             def __init__(self):
@@ -42,16 +45,21 @@ def load_models():
                 x = self.fc2(x)
                 return x
 
+        # Load PyTorch model
+        model_path = os.path.join(".", "best_mri_classifier.pth")
         model = CustomCNN()
-        model.load_state_dict(torch.load(r"C:\main project files\mri and non mri classfier\best_mri_classifier.pth", map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         model.eval()
         return model
 
+    # Load all models using relative paths
     custom_cnn_model = load_custom_model()
-    classifier_model = tf.keras.models.load_model(r"C:\Users\dilee\Downloads\cnn model traning\brain_tumor_classifier.h5")
-    segmentation_model = tf.keras.models.load_model(r"C:\Users\dilee\Downloads\cnn model traning\brain_tumor_segmentation_unet.h5")
-    tumor_size_model = tf.keras.models.load_model(r"C:\Users\dilee\Downloads\tumor_size_model.h5")
+    classifier_model = tf.keras.models.load_model("./brain_tumor_classifier.h5")
+    segmentation_model = tf.keras.models.load_model("./brain_tumor_segmentation_unet.h5")
+    tumor_size_model = tf.keras.models.load_model("./tumor_size_model.h5")
+
     return custom_cnn_model, classifier_model, segmentation_model, tumor_size_model
+
 
 # ======================
 # PROCESSING FUNCTIONS
