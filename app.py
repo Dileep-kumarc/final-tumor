@@ -2018,6 +2018,7 @@ def advanced_analysis_page():
 # MAIN APP CONFIG
 # ======================
 
+
 def main():
     st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="wide")
     with open("style.css") as f:
@@ -2040,7 +2041,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # 👇 This must be inside main() and properly indented
     query_params = st.query_params.get("page", "Home")
 
     if query_params == "Home":
@@ -2050,15 +2050,15 @@ def main():
     elif query_params == "AdvancedAnalysis":
         advanced_analysis_page()
     elif query_params == "HowItWorks":
-        st.switch_page("2_How_It_Works.py")   # Use FILE name
+        from 2_How_It_Works import how_it_works_page
+        how_it_works_page()
     elif query_params == "About":
-        st.switch_page("1_About.py")           # Use FILE name
+        from 1_About import about_page
+        about_page()
     elif query_params == "Contact":
-        st.switch_page("3_Contact.py")         # Use FILE name
+        from 3_Contact import contact_page
+        contact_page()
 
-# Call main() outside
-if __name__ == "__main__":
-    main()
 
 if __name__ == "__main__":
     main()
