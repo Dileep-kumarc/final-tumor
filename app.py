@@ -2049,11 +2049,11 @@ def main():
     elif query_params == "AdvancedAnalysis":
         advanced_analysis_page()
     elif query_params == "HowItWorks":
-        st.switch_page("pages/2_How_It_Works.py")
+        st.switch_page("2_How_It_Works.py")
     elif query_params == "About":
-        st.switch_page("pages/1_About.py")
+        st.switch_page("1_About.py")
     elif query_params == "Contact":
-        st.switch_page("pages/3_Contact.py")
+        st.switch_page("3_Contact.py")
 
 if __name__ == "__main__":
     main()
