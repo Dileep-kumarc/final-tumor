@@ -2040,20 +2040,20 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    query_params = st.query_params.get("page", "Home")
+  query_params = st.query_params.get("page", "Home")
 
-    if query_params == "Home":
-        home_page()
-    elif query_params == "Analysis":
-        analysis_page()
-    elif query_params == "AdvancedAnalysis":
-        advanced_analysis_page()
-    elif query_params == "HowItWorks":
-        st.switch_page("2_How_It_Works.py")
-    elif query_params == "About":
-        st.switch_page("1_About.py")
-    elif query_params == "Contact":
-        st.switch_page("3_Contact.py")
+if query_params == "Home":
+    home_page()
+elif query_params == "Analysis":
+    analysis_page()
+elif query_params == "AdvancedAnalysis":
+    advanced_analysis_page()
+elif query_params == "HowItWorks":
+    st.switch_page("How It Works")  # NOT 2_How_It_Works.py
+elif query_params == "About":
+    st.switch_page("About")         # NOT 1_About.py
+elif query_params == "Contact":
+    st.switch_page("Contact")       # NOT 3_Contact.py
 
 if __name__ == "__main__":
     main()
