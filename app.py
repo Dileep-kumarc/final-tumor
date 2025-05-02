@@ -2041,9 +2041,10 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    query_params = st.query_params.get("page", "Home")
+import streamlit as st
+import importlib
 
-    
+query_params = st.query_params.get("page", "Home")
 
 if query_params == "Home":
     home_page()
