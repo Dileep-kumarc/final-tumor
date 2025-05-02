@@ -2050,13 +2050,13 @@ def main():
     elif query_params == "AdvancedAnalysis":
         advanced_analysis_page()
     elif query_params == "HowItWorks":
-        from pages.How_It_Works import how_it_works_page
+        from How_It_Works import how_it_works_page
         how_it_works_page()
     elif query_params == "About":
-        from pages.About import about_page
+        from About import about_page
         about_page()
     elif query_params == "Contact":
-        from pages.Contact import contact_page
+        from Contact import contact_page
         contact_page()
 
 
