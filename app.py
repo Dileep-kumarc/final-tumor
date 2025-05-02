@@ -2043,21 +2043,29 @@ def main():
 
     query_params = st.query_params.get("page", "Home")
 
-    if query_params == "Home":
-        home_page()
-    elif query_params == "Analysis":
-        analysis_page()
-    elif query_params == "AdvancedAnalysis":
-        advanced_analysis_page()
-    elif query_params == "HowItWorks":
-        from How_It_Works import how_it_works_page
-        how_it_works_page()
-    elif query_params == "About":
-        from About import about_page
-        about_page()
-    elif query_params == "Contact":
-        from Contact import contact_page
-        contact_page()
+    
+
+if query_params == "Home":
+    home_page()
+
+elif query_params == "Analysis":
+    analysis_page()
+
+elif query_params == "AdvancedAnalysis":
+    advanced_analysis_page()
+
+elif query_params == "HowItWorks":
+    how_it_works = importlib.import_module("2_How_It_Works")
+    how_it_works.how_it_works_page()
+
+elif query_params == "About":
+    about = importlib.import_module("1_About")
+    about.about_page()
+
+elif query_params == "Contact":
+    contact = importlib.import_module("3_Contact")
+    contact.contact_page()
+
 
 
 if __name__ == "__main__":
