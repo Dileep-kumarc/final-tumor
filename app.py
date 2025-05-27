@@ -13,8 +13,6 @@ import matplotlib.pyplot as plt  # Now this is at the top level
 import time
 import plotly.express as px
 
-# Rest of your code remains the same...
-
 # ======================
 # MODEL DEFINITIONS
 # ======================
@@ -1581,13 +1579,6 @@ def advanced_analysis_page():
                     plt.tight_layout()
                     plt.savefig(overlay_img_bytes, format='png', bbox_inches='tight', dpi=300)
                     plt.close()
-                    overlay = np.clip(overlay, 0, 1)
-                    plt.imshow(overlay)
-                    plt.axis('off')
-                    plt.title("Tumor Overlay")
-                    plt.tight_layout()
-                    plt.savefig(overlay_img_bytes, format='png', bbox_inches='tight', dpi=300)
-                    plt.close()
                     
                   
                     
@@ -1672,6 +1663,14 @@ def advanced_analysis_page():
                         spaceBefore=30
                     )
                     
+                    footer_style = ParagraphStyle(
+                        'Footer',
+                        parent=styles['Normal'],
+                        fontSize=8,
+                        textColor=colors.darkgrey,
+                        alignment=TA_CENTER
+                    )
+                    
                     story = []
                     
                     # Header with logo placeholder
@@ -1740,7 +1739,7 @@ def advanced_analysis_page():
                         
                         # Cell styling
                         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-                        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
                         ('FONTSIZE', (0, 1), (-1, -1), 10),
                         ('TOPPADDING', (0, 1), (-1, -1), 6),
                         ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
@@ -1885,7 +1884,7 @@ def advanced_analysis_page():
                     story.append(Paragraph("12-Month Tumor Growth Prediction", section_title_style))
                     
                     # Growth chart
-                                       # Save growth prediction chart
+                    # Save growth prediction chart
                     growth_chart_bytes = BytesIO()
                     fig = plt.figure(figsize=(8, 5))
                     plt.plot(range(13), predicted_sizes, marker='o', linestyle='-', color='#00d2ff', linewidth=3, markersize=8)
@@ -2021,6 +2020,7 @@ def advanced_analysis_page():
 
 def main():
     st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="wide")
+    # Move set_page_config to the very top before any other Streamlit calls
     with open("style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
