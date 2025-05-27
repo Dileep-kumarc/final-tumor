@@ -2068,24 +2068,33 @@ def main():
         </div>
     </div>
     """, unsafe_allow_html=True)
+import importlib.util
+import os
 
-    query_params = st.query_params.get("page", "Home")
+def load_module_from_file(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
-    if query_params == "Home":
-        home_page()
-    elif query_params == "Analysis":
-        analysis_page()
-    elif query_params == "AdvancedAnalysis":
-        advanced_analysis_page()
-    elif query_params == "HowItWorks":
-        how_it_works = importlib.import_module("2_How_It_Works")
-        how_it_works.how_it_works_page()
-    elif query_params == "About":
-        about = importlib.import_module("1_About")
-        about.about_page()
-    elif query_params == "Contact":
-        contact = importlib.import_module("3_Contact")
-        contact.contact_page()
+query_params = st.query_params.get("page", "Home")
+
+if query_params == "Home":
+    home_page()
+elif query_params == "Analysis":
+    analysis_page()
+elif query_params == "AdvancedAnalysis":
+    advanced_analysis_page()
+elif query_params == "HowItWorks":
+    how_it_works = load_module_from_file("how_it_works", os.path.join(os.path.dirname(__file__), "2_How_It_Works.py"))
+    how_it_works.how_it_works_page()
+elif query_params == "About":
+    about = load_module_from_file("about", os.path.join(os.path.dirname(__file__), "1_About.py"))
+    about.about_page()
+elif query_params == "Contact":
+    contact = load_module_from_file("contact", os.path.join(os.path.dirname(__file__), "3_Contact.py"))
+    contact.contact_page()
+
 
 if __name__ == "__main__":
     main()
