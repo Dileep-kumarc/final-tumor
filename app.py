@@ -12,17 +12,26 @@ matplotlib.use('Agg')  # Set the backend before importing pyplot
 import matplotlib.pyplot as plt  # Now this is at the top level
 import time
 import plotly.express as px
+import importlib
+
+# 📥 GITHUB BASE URL
+# -----------------------------
+GITHUB_BASE_URL = "https://github.com/Dileep-kumarc/final-tumor/raw/master/"
+
+# Example usage for model loading:
+# Instead of loading local files, use the GITHUB_BASE_URL to construct the download path
+# For example, to load a model:
+# model_path = GITHUB_BASE_URL + "brain_tumor_classifier.h5"
+# model = load_model(model_path)
+# You may need to download the file first if your framework does not support direct loading from URL
 
 # ======================
 # MODEL DEFINITIONS
 # ======================
 
-
-
 @st.cache_resource
 def load_models():
     """Load all ML models with caching"""
-
     def load_custom_model():
         class CustomCNN(nn.Module):
             def __init__(self):
@@ -43,21 +52,37 @@ def load_models():
                 x = self.fc2(x)
                 return x
 
-        # Load PyTorch model
-        model_path = os.path.join(".", "best_mri_classifier.pth")
+        # Download model from GitHub if not present locally
+        import requests
+        import os
+        def download_file(url, local_path):
+            if not os.path.exists(local_path):
+                r = requests.get(url)
+                with open(local_path, 'wb') as f:
+                    f.write(r.content)
+
+        # Paths for local storage
+        local_pth = "best_mri_classifier.pth"
+        local_classifier = "brain_tumor_classifier.h5"
+        local_segmentation = "brain_tumor_segmentation_unet.h5"
+        local_size = "tumor_size_model.h5"
+
+        # Download from GitHub if needed
+        download_file(GITHUB_BASE_URL + "best_mri_classifier.pth", local_pth)
+        download_file(GITHUB_BASE_URL + "brain_tumor_classifier.h5", local_classifier)
+        download_file(GITHUB_BASE_URL + "brain_tumor_segmentation_unet.h5", local_segmentation)
+        download_file(GITHUB_BASE_URL + "tumor_size_model.h5", local_size)
+
         model = CustomCNN()
-        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load(local_pth, map_location=torch.device('cpu')))
         model.eval()
         return model
 
-    # Load all models using relative paths
     custom_cnn_model = load_custom_model()
-    classifier_model = tf.keras.models.load_model("./brain_tumor_classifier.h5")
-    segmentation_model = tf.keras.models.load_model("./brain_tumor_segmentation_unet.h5")
-    tumor_size_model = tf.keras.models.load_model("./tumor_size_model.h5")
-
+    classifier_model = tf.keras.models.load_model("brain_tumor_classifier.h5")
+    segmentation_model = tf.keras.models.load_model("brain_tumor_segmentation_unet.h5")
+    tumor_size_model = tf.keras.models.load_model("tumor_size_model.h5")
     return custom_cnn_model, classifier_model, segmentation_model, tumor_size_model
-
 
 # ======================
 # PROCESSING FUNCTIONS
@@ -136,7 +161,7 @@ def home_page():
             <div class="hero-buttons">
                 <a href="/?page=Analysis" class="primary-button">Get Started Now</a>
                 <div class="stats-badge">
-                    <span class="stats-number">98.5%</span>
+                    <span class="stats-number">90%</span>
                     <span class="stats-text">Accuracy Rate</span>
                 </div>
             </div>
@@ -1574,6 +1599,7 @@ def advanced_analysis_page():
                     overlay = overlay * (1 - overlay_alpha * mask_rgb) + overlay_alpha * mask_rgb
                     overlay = np.clip(overlay, 0, 1)
                     plt.imshow(overlay)
+
                     plt.axis('off')
                     plt.title("Tumor Overlay")
                     plt.tight_layout()
@@ -1749,7 +1775,12 @@ def advanced_analysis_page():
                         ('BOX', (0, 0), (-1, -1), 1, colors.darkgrey),
                     ]))
                     story.append(results_table)
-                    story.append(Spacer(1, 15))
+                    
+                    # Section divider
+                    story.append(Spacer(1, 10))
+                    story.append(Table([['']], colWidths=[7*inch], style=[
+                        ('LINEABOVE', (0, 0), (-1, 0), 1, colors.lightgrey),
+                    ]))
                     
                     # MRI Scan Analysis Section
                     story.append(Paragraph("MRI Scan Analysis", section_title_style))
@@ -1784,7 +1815,6 @@ def advanced_analysis_page():
                     
                     # Tumor Characteristics
                     story.append(Paragraph("Tumor Characteristics", subsection_title_style))
-                    features = extract_features_for_size(mask)
                     
                     characteristics_text = (
                         f"The tumor exhibits a perimeter of {features[1]:.2f} pixels with an aspect ratio of {features[2]:.2f}. "
@@ -1884,7 +1914,7 @@ def advanced_analysis_page():
                     story.append(Paragraph("12-Month Tumor Growth Prediction", section_title_style))
                     
                     # Growth chart
-                    # Save growth prediction chart
+                                       # Save growth prediction chart
                     growth_chart_bytes = BytesIO()
                     fig = plt.figure(figsize=(8, 5))
                     plt.plot(range(13), predicted_sizes, marker='o', linestyle='-', color='#00d2ff', linewidth=3, markersize=8)
@@ -2017,10 +2047,8 @@ def advanced_analysis_page():
 # MAIN APP CONFIG
 # ======================
 
-
 def main():
     st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="wide")
-    # Move set_page_config to the very top before any other Streamlit calls
     with open("style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
@@ -2041,33 +2069,23 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-import streamlit as st
-import importlib
+    query_params = st.query_params.get("page", "Home")
 
-query_params = st.query_params.get("page", "Home")
-
-if query_params == "Home":
-    home_page()
-
-elif query_params == "Analysis":
-    analysis_page()
-
-elif query_params == "AdvancedAnalysis":
-    advanced_analysis_page()
-
-elif query_params == "HowItWorks":
-    how_it_works = importlib.import_module("2_How_It_Works")
-    how_it_works.how_it_works_page()
-
-elif query_params == "About":
-    about = importlib.import_module("1_About")
-    about.about_page()
-
-elif query_params == "Contact":
-    contact = importlib.import_module("3_Contact")
-    contact.contact_page()
-
-
+    if query_params == "Home":
+        home_page()
+    elif query_params == "Analysis":
+        analysis_page()
+    elif query_params == "AdvancedAnalysis":
+        advanced_analysis_page()
+    elif query_params == "HowItWorks":
+        how_it_works = importlib.import_module("2_How_It_Works")
+        how_it_works.how_it_works_page()
+    elif query_params == "About":
+        about = importlib.import_module("1_About")
+        about.about_page()
+    elif query_params == "Contact":
+        contact = importlib.import_module("3_Contact")
+        contact.contact_page()
 
 if __name__ == "__main__":
     main()
